@@ -88,6 +88,12 @@ class _MatchScreenState extends State<MatchScreen> {
     if (current is! PoseOpen) {
       return;
     }
+    // Strike sits where Practice was, so a tap during the entrance slide is a
+    // leftover Practice tap, not a strike.
+    final entrance = ModalRoute.of(context)?.animation;
+    if (entrance != null && !entrance.isCompleted) {
+      return;
+    }
     final at = _now();
     final reading = fakePoseReading(current.target);
     final index = current.index;

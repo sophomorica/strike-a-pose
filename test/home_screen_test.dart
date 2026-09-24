@@ -55,6 +55,25 @@ void main() {
     semantics.dispose();
   });
 
+  testWidgets('a second Practice tap 120ms later does not score on Strike', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
+    final practice = tester.getCenter(find.text('Practice'));
+    await tester.tapAt(practice);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 120));
+    await tester.tapAt(practice);
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('Score 0'), findsOneWidget);
+    expect(find.text('Strike').hitTestable(), findsOneWidget);
+  });
+
   testWidgets('Leave round on a live pose goes back to Home', (tester) async {
     await openPractice(tester);
     await tester.tap(find.byTooltip('Leave round'));
