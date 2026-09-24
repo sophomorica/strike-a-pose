@@ -27,13 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final plan = practiceRound(DateTime.now().microsecondsSinceEpoch);
       await Navigator.push<void>(
         context,
-        PageRouteBuilder<void>(
-          pageBuilder: (context, animation, secondaryAnimation) {
-            return MatchScreen(plan: plan);
-          },
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
+        MaterialPageRoute<void>(builder: (context) => MatchScreen(plan: plan)),
       );
     } finally {
       if (mounted) {

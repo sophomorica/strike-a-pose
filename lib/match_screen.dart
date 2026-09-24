@@ -112,7 +112,7 @@ class _MatchScreenState extends State<MatchScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 16),
+        _leaveRound(),
         Text(
           state.target.name,
           textAlign: TextAlign.center,
@@ -154,7 +154,7 @@ class _MatchScreenState extends State<MatchScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 16),
+        _leaveRound(),
         Text(
           state.target.name,
           textAlign: TextAlign.center,
@@ -179,7 +179,7 @@ class _MatchScreenState extends State<MatchScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 16),
+        _leaveRound(),
         Text(
           'Score ${state.score}',
           textAlign: TextAlign.center,
@@ -227,6 +227,18 @@ class _MatchScreenState extends State<MatchScreen> {
         ),
         const Spacer(),
       ],
+    );
+  }
+
+  Widget _leaveRound() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: IconButton(
+        onPressed: () => Navigator.pop(context),
+        tooltip: 'Leave round',
+        color: _ink,
+        icon: const Icon(Icons.close),
+      ),
     );
   }
 

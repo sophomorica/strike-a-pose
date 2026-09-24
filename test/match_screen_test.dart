@@ -29,11 +29,14 @@ void main() {
     await pumpMatch(tester, elapsed: () => elapsed);
     expect(find.text('Score 0'), findsOneWidget);
     expect(find.text('Strike'), findsOneWidget);
+    expect(find.byTooltip('Leave round'), findsOneWidget);
+    expect(tester.getSize(find.byType(IconButton)), const Size(48, 48));
 
     await tester.tap(find.text('Strike'));
     await tester.pump();
     expect(find.text('Score 1'), findsOneWidget);
     expect(find.text('Strike'), findsNothing);
+    expect(find.byTooltip('Leave round'), findsOneWidget);
     expect(
       tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
       const Color(0xFF1F8A4C),
@@ -42,6 +45,8 @@ void main() {
     elapsed = const Duration(milliseconds: 400);
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.text('1 of 1'), findsOneWidget);
+    expect(find.text('Leave'), findsOneWidget);
+    expect(find.byTooltip('Leave round'), findsNothing);
   });
 
   testWidgets('the deadline shows a miss and keeps the score', (tester) async {
@@ -51,6 +56,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.text('Miss'), findsOneWidget);
     expect(find.text('Score 0'), findsOneWidget);
+    expect(find.byTooltip('Leave round'), findsOneWidget);
   });
 
   testWidgets('practice opens the strike button', (tester) async {
@@ -61,6 +67,7 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
     await tester.tap(find.text('Practice'));
     await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
     expect(find.text('Strike'), findsOneWidget);
   });
 }
