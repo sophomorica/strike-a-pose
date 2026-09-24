@@ -39,7 +39,7 @@ void main() {
     expect(find.byTooltip('Leave round'), findsOneWidget);
     expect(
       tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
-      const Color(0xFF1F8A4C),
+      const Color(0xFF1B7A43),
     );
 
     elapsed = const Duration(milliseconds: 400);

@@ -10,9 +10,9 @@ import 'silhouette_painter.dart';
 
 const _background = Color(0xFF141210);
 const _ink = Color(0xFFF4EFE6);
-const _strike = Color(0xFFE23D28);
+const _strike = Color(0xFFE8452F);
 const _strikeInk = Color(0xFF141210);
-const _hit = Color(0xFF1F8A4C);
+const _hit = Color(0xFF1B7A43);
 const _miss = Color(0xFFE26D5A);
 const _silhouetteMinHeight = 200.0;
 

@@ -5,7 +5,7 @@ import 'home_screen.dart';
 
 const _background = Color(0xFF141210);
 const _ink = Color(0xFFF4EFE6);
-const _strike = Color(0xFFE23D28);
+const _strike = Color(0xFFE8452F);
 const _strikeInk = Color(0xFF141210);
 
 Future<void> main() async {
