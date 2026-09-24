@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:strike_a_pose/fake_pose.dart';
+import 'package:strike_a_pose/pose.dart';
 import 'package:strike_a_pose/pose_catalog.dart';
 import 'package:strike_a_pose/round.dart';
 
@@ -20,6 +21,43 @@ void main() {
     expect(open.score, 0);
     expect(open.deadline, const Duration(seconds: 6));
     expect(open.observedAt, Duration.zero);
+  });
+
+  test('beginRound at three seconds sets the deadline at nine', () {
+    final open =
+        beginRound(onePose(), at: const Duration(seconds: 3)) as PoseOpen;
+    expect(open.observedAt, const Duration(seconds: 3));
+    expect(open.deadline, const Duration(seconds: 9));
+  });
+
+  test('a strike with another pose keeps the pose open with no point', () {
+    final open = beginRound(onePose()) as PoseOpen;
+    final next = reduceRound(
+      open,
+      StrikeSubmitted(
+        poseIndex: 0,
+        at: const Duration(seconds: 1),
+        reading: PoseReading(PoseCatalog.all[1].skeleton),
+      ),
+    );
+    expect(next, isA<PoseOpen>());
+    final still = next as PoseOpen;
+    expect(still.index, 0);
+    expect(still.score, 0);
+    expect(still.deadline, const Duration(seconds: 6));
+  });
+
+  test('a strike aimed at another pose index is ignored', () {
+    final open = beginRound(twoPoses()) as PoseOpen;
+    final next = reduceRound(
+      open,
+      StrikeSubmitted(
+        poseIndex: 1,
+        at: const Duration(seconds: 1),
+        reading: fakePoseReading(open.target),
+      ),
+    );
+    expect(identical(next, open), isTrue);
   });
 
   test('a fake strike at one second flashes a hit', () {
@@ -161,5 +199,12 @@ void main() {
     final poses = practiceRound(7).poses;
     expect(poses.length, 5);
     expect(poses.map((pose) => pose.name).toSet().length, 5);
+  });
+
+  test('practiceRound deals seeds 1 and 2 in different orders', () {
+    List<String> names(int seed) =>
+        practiceRound(seed).poses.map((pose) => pose.name).toList();
+    expect(names(1), ['Squat', 'Victory', 'Cactus', 'Rocket', 'Robot']);
+    expect(names(2), ['Lunge', 'Ski', 'Rocket', 'Disco', 'Windmill']);
   });
 }

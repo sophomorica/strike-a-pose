@@ -35,6 +35,26 @@ void main() {
     }
   });
 
+  testWidgets('two taps on Practice before a frame open one round', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(const MaterialApp(home: HomeScreen()));
+    // Navigator absorbs pointers from a push until the next frame, so only an
+    // accessibility tap can reach Practice a second time before that frame.
+    tester.semantics.tap(find.semantics.byLabel('Practice'));
+    tester.semantics.tap(find.semantics.byLabel('Practice'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    // A covered route is built offstage, and the default finder skips it.
+    expect(find.byType(MatchScreen, skipOffstage: false), findsOneWidget);
+    semantics.dispose();
+  });
+
   testWidgets('Leave round on a live pose goes back to Home', (tester) async {
     await openPractice(tester);
     await tester.tap(find.byTooltip('Leave round'));
