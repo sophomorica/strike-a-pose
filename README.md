@@ -12,7 +12,7 @@ flutter test
 
 ## Run on iPhone
 
-Connect an iPhone and run the app. The bundle id is `com.narrowroad.strikeapose`. The target is iOS 16. The app is iPhone only and portrait only.
+You need a Mac with Xcode and an Apple account in team `JQ7J89B22A`, which signs the app automatically. Connect an iPhone and run the app. The bundle id is `com.narrowroad.strikeapose`. The target is iOS 16. The app is iPhone only and portrait only.
 
 ```bash
 flutter run
