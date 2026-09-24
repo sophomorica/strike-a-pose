@@ -59,6 +59,37 @@ void main() {
     expect(find.byTooltip('Leave round'), findsOneWidget);
   });
 
+  testWidgets(
+    'a pose window spent in the background does not expire the pose',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MatchScreen(plan: RoundPlan([PoseCatalog.all.first])),
+        ),
+      );
+      for (final state in [
+        AppLifecycleState.inactive,
+        AppLifecycleState.hidden,
+        AppLifecycleState.paused,
+      ]) {
+        tester.binding.handleAppLifecycleStateChanged(state);
+      }
+      await tester.runAsync(
+        () => Future<void>.delayed(poseWindow + const Duration(seconds: 1)),
+      );
+      for (final state in [
+        AppLifecycleState.hidden,
+        AppLifecycleState.inactive,
+        AppLifecycleState.resumed,
+      ]) {
+        tester.binding.handleAppLifecycleStateChanged(state);
+      }
+      await tester.pump(const Duration(milliseconds: 100));
+      expect(find.text('Strike'), findsOneWidget);
+      expect(find.text('Miss'), findsNothing);
+    },
+  );
+
   testWidgets('practice opens the strike button', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;

@@ -29,6 +29,7 @@ class MatchScreen extends StatefulWidget {
 class _MatchScreenState extends State<MatchScreen> {
   late RoundState _round;
   Stopwatch? _stopwatch;
+  AppLifecycleListener? _lifecycle;
   Timer? _timer;
 
   @override
@@ -36,7 +37,17 @@ class _MatchScreenState extends State<MatchScreen> {
     super.initState();
     _round = beginRound(widget.plan);
     if (widget.elapsed == null) {
-      _stopwatch = Stopwatch()..start();
+      final stopwatch = Stopwatch()..start();
+      _stopwatch = stopwatch;
+      _lifecycle = AppLifecycleListener(
+        onStateChange: (state) {
+          if (state == AppLifecycleState.resumed) {
+            stopwatch.start();
+          } else {
+            stopwatch.stop();
+          }
+        },
+      );
     }
     _timer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       _onClock();
@@ -45,6 +56,7 @@ class _MatchScreenState extends State<MatchScreen> {
 
   @override
   void dispose() {
+    _lifecycle?.dispose();
     _timer?.cancel();
     super.dispose();
   }
