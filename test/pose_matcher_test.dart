@@ -5,7 +5,7 @@ import 'package:strike_a_pose/pose_catalog.dart';
 import 'package:strike_a_pose/pose_matcher.dart';
 
 void main() {
-  PoseReading readingOf(PoseSkeleton skeleton, {Joint? head}) {
+  PoseReading readingOf(PoseSkeleton skeleton, {Joint? head, Joint? wristL}) {
     return PoseReading(
       PoseSkeleton(
         head: head ?? skeleton.head,
@@ -13,7 +13,7 @@ void main() {
         shoulderR: skeleton.shoulderR,
         elbowL: skeleton.elbowL,
         elbowR: skeleton.elbowR,
-        wristL: skeleton.wristL,
+        wristL: wristL ?? skeleton.wristL,
         wristR: skeleton.wristR,
         hipL: skeleton.hipL,
         hipR: skeleton.hipR,
@@ -89,6 +89,36 @@ void main() {
         reading: readingOf(
           pose.skeleton,
           head: Joint(double.infinity, head.y, head.z),
+        ),
+      ),
+      PoseVerdict.miss,
+    );
+  });
+
+  test('a left wrist moved 0.05 in depth is a hit', () {
+    final pose = PoseCatalog.all.first;
+    final wrist = pose.skeleton.wristL;
+    expect(
+      matchPose(
+        target: pose,
+        reading: readingOf(
+          pose.skeleton,
+          wristL: Joint(wrist.x, wrist.y, wrist.z + 0.05),
+        ),
+      ),
+      PoseVerdict.hit,
+    );
+  });
+
+  test('a left wrist moved 0.12 in depth is a miss', () {
+    final pose = PoseCatalog.all.first;
+    final wrist = pose.skeleton.wristL;
+    expect(
+      matchPose(
+        target: pose,
+        reading: readingOf(
+          pose.skeleton,
+          wristL: Joint(wrist.x, wrist.y, wrist.z + 0.12),
         ),
       ),
       PoseVerdict.miss,
