@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,7 @@ const _strike = Color(0xFFE23D28);
 const _strikeInk = Color(0xFF141210);
 const _hit = Color(0xFF1F8A4C);
 const _miss = Color(0xFFE26D5A);
+const _silhouetteMinHeight = 200.0;
 
 class MatchScreen extends StatefulWidget {
   final RoundPlan plan;
@@ -113,28 +115,31 @@ class _MatchScreenState extends State<MatchScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _leaveRound(),
-        Text(
-          state.target.name,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: _ink,
-            fontSize: 32,
-            fontWeight: FontWeight.w700,
-          ),
+        Expanded(
+          child: _textOverSilhouette(state.target.skeleton, [
+            Text(
+              state.target.name,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: _ink,
+                fontSize: 32,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Score ${state.score}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: _ink, fontSize: 18),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _countdown(state),
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: _ink, fontSize: 18),
+            ),
+          ]),
         ),
-        const SizedBox(height: 8),
-        Text(
-          'Score ${state.score}',
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: _ink, fontSize: 18),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          _countdown(state),
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: _ink, fontSize: 18),
-        ),
-        Expanded(child: _silhouette(state.target.skeleton)),
         ElevatedButton(
           onPressed: _onStrike,
           style: ElevatedButton.styleFrom(
@@ -155,22 +160,25 @@ class _MatchScreenState extends State<MatchScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _leaveRound(),
-        Text(
-          state.target.name,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: _ink,
-            fontSize: 32,
-            fontWeight: FontWeight.w700,
-          ),
+        Expanded(
+          child: _textOverSilhouette(state.target.skeleton, [
+            Text(
+              state.target.name,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: _ink,
+                fontSize: 32,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Score ${state.score}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: _ink, fontSize: 18),
+            ),
+          ]),
         ),
-        const SizedBox(height: 8),
-        Text(
-          'Score ${state.score}',
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: _ink, fontSize: 18),
-        ),
-        Expanded(child: _silhouette(state.target.skeleton)),
       ],
     );
   }
@@ -239,6 +247,37 @@ class _MatchScreenState extends State<MatchScreen> {
         color: _ink,
         icon: const Icon(Icons.close),
       ),
+    );
+  }
+
+  Widget _textOverSilhouette(PoseSkeleton skeleton, List<Widget> text) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: math.max(
+                  0,
+                  constraints.maxHeight - _silhouetteMinHeight,
+                ),
+              ),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: SizedBox(
+                  width: constraints.maxWidth,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: text,
+                  ),
+                ),
+              ),
+            ),
+            Expanded(child: _silhouette(skeleton)),
+          ],
+        );
+      },
     );
   }
 
