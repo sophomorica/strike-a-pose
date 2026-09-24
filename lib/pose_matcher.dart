@@ -12,6 +12,9 @@ PoseVerdict matchPose({
   var maxSquared = 0.0;
   for (var i = 0; i < targets.length; i++) {
     final squared = _distanceSquared(targets[i], readings[i]);
+    if (!squared.isFinite) {
+      return PoseVerdict.miss;
+    }
     if (squared > maxSquared) {
       maxSquared = squared;
     }
