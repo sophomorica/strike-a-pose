@@ -1,31 +1,24 @@
 # Strike a Pose
 
-This repo is the Strike a Pose practice round for Narrow Road Studios.
+One iPhone, passed around the room. Players copy the hole in a foam wall. The phone scores the pose and keeps the snapshot in the app.
 
-## Run tests
+This is the v1 game. The old practice round is gone.
 
-`flutter test` runs the matcher, the round, and the match screen.
+## Run the tests
 
 ```bash
+flutter analyze
 flutter test
 ```
 
-## Run on iPhone
+This machine cannot run iOS. Pose scoring is pure Dart behind `PoseFeed`. `MlKitPoseSource` is the only production detector, and tests never import it.
 
-You need a Mac with Xcode and an Apple account in team `JQ7J89B22A`, which signs the app automatically. Connect an iPhone and run the app. The bundle id is `com.narrowroad.strikeapose`. The target is iOS 16. The app is iPhone only and portrait only.
+## Run it on an iPhone
+
+See [DEVICE-CHECK.md](DEVICE-CHECK.md). Deployment target is iOS 15.5, team `JQ7J89B22A`, bundle id `com.narrowroad.strikeapose`.
 
 ```bash
 flutter run
 ```
 
-## Practice
-
-The practice round uses a stand-in camera. Five poses stay up for six seconds each. Strike scores a point. Waiting out the clock misses.
-
-## Out of scope
-
-This kick does not open the camera, does not use Bluetooth, and does not ship accounts or purchases.
-
-## SDK
-
-Flutter 3.47.5 is the SDK this project was generated with.
+A debug build can use the scripted body only with both conditions true: a debug build, and `--dart-define=FAKE_POSE=true`. Release builds cannot construct that source.
