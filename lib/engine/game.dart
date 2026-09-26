@@ -1,10 +1,12 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'body.dart';
 import 'catalog.dart';
 import 'fit.dart';
 import 'mirror.dart';
 import 'score.dart';
+import 'still.dart';
 
 enum Phase {
   home,
@@ -195,6 +197,9 @@ class GameSession {
   FitReading? liveFit;
   MeasuredPose? liveMeasure;
   PoseFrame? liveFrame;
+  StillFrame? latestStill;
+  final Map<String, StillFrame> stills = {};
+  final Map<String, Uint8List> photos = {};
   PoseAngles? smoothed;
   final Map<LimbId, LimbStatus> limbStatus = {};
   double framingHeld = 0;
@@ -622,6 +627,8 @@ class GameSession {
     round = 1;
     turn = 0;
     snaps.clear();
+    stills.clear();
+    photos.clear();
     judgePicks.clear();
     usedPoseIds.clear();
     kept.clear();
@@ -971,6 +978,9 @@ class GameSession {
     );
     snaps.add(snap);
     lastSnap = snap;
+    if (!referee && latestStill != null) {
+      stills[snap.id] = latestStill!.copy();
+    }
   }
 
   void _advancePose() {

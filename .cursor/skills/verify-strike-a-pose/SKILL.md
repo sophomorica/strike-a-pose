@@ -34,6 +34,8 @@ The scoring drive is:
 flutter test test/engine_test.dart --reporter expanded
 ```
 
+The photo and undo checks are `test/snap_image_test.dart` (fixture pixels are mirrored and are not the drawn stage) and the engine test `a deleted snap file is gone after the 5 second undo`.
+
 ## Evidence
 
 Screenshots of each screen are written by `flutter test test/golden_test.dart` to `artifacts/screens/` and `/opt/cursor/artifacts/screens/`. The design-pack mock PNGs were not on disk, so there is no side-by-side composite.

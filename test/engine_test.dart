@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:strike_a_pose/engine/body.dart';
@@ -9,6 +10,7 @@ import 'package:strike_a_pose/engine/game.dart';
 import 'package:strike_a_pose/engine/mirror.dart';
 import 'package:strike_a_pose/engine/retention.dart';
 import 'package:strike_a_pose/engine/score.dart';
+import 'package:strike_a_pose/engine/still.dart';
 import 'package:strike_a_pose/pose_gate.dart';
 
 void main() {
@@ -494,6 +496,69 @@ void main() {
     expect(await store.totalBytes(), 0);
     expect(storageNotice(500 * 1024 * 1024 + 1), isTrue);
     expect(storageNotice(100), isFalse);
+    await root.delete(recursive: true);
+  });
+
+  test('a camera still is copied onto the snap and a referee snap has none', () {
+    final session = _family(players: 2, rounds: 1, poses: 1, judge: false);
+    final still = StillFrame(width: 2, height: 2, bgra: Uint8List(16)..fillRange(0, 16, 40));
+    session.latestStill = still;
+    _playPerfectPose(session);
+    final kept = session.stills[session.snaps.first.id]!;
+    expect(kept.bgra[0], 40);
+    still.bgra[0] = 7;
+    expect(kept.bgra[0], 40);
+
+    final ref = GameSession(random: Random(1), now: () => DateTime(2026, 9, 25, 21));
+    ref.addPlayer('Jess');
+    ref.addPlayer('Theo');
+    ref.settings.rounds = 1;
+    ref.settings.posesPerTurn = 1;
+    ref.latestStill = still;
+    ref.playReferee();
+    ref.tick(2.5, null);
+    ref.nailedIt();
+    expect(ref.snaps, isNotEmpty);
+    expect(ref.stills, isEmpty);
+  });
+
+  test('a deleted snap file is gone after the 5 second undo', () async {
+    final root = await Directory.systemTemp.createTemp('undo');
+    final store = FileSnapStore(root);
+    final session = GameSession();
+    session.addPlayer('Jess');
+    session.addPlayer('Theo');
+    session.gameId = 'gundo';
+    final snap = Snap(
+      id: 's1',
+      round: 1,
+      playerId: 'p1',
+      playerName: 'Jess',
+      poseId: 'star_jump',
+      poseName: 'Star Jump',
+      points: 0,
+      fitPercent: 40,
+      stamp: 'SO CLOSE · 40%',
+      matched: false,
+      sudden: false,
+      seq: 1,
+      at: DateTime(2026, 9, 25),
+      footer: 'R1 · POSE 1 · SEP 25',
+      breakdown: scoreMissed(40),
+    );
+    session.snaps.add(snap);
+    await store.writeJpeg(session.gameId, snap.fileName, [0xFF, 0xD8, 0xFF]);
+    final file = File('${root.path}/snaps/gundo/${snap.fileName}');
+    expect(file.existsSync(), isTrue);
+    session.deleteSnapRequested(snap.id);
+    session.tick(4.9, null);
+    await store.applyExpiredUndo(session);
+    expect(file.existsSync(), isTrue);
+    expect(session.snaps, hasLength(1));
+    session.tick(0.2, null);
+    await store.applyExpiredUndo(session);
+    expect(file.existsSync(), isFalse);
+    expect(session.snaps.where((item) => item.id == snap.id), isEmpty);
     await root.delete(recursive: true);
   });
 

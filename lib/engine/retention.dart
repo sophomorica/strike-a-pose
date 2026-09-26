@@ -210,6 +210,19 @@ class FileSnapStore {
         .toList();
   }
 
+  Future<void> applyExpiredUndo(GameSession session) async {
+    if (session.undoSnapId == null || session.undoLeft > 0) return;
+    final id = session.undoSnapId!;
+    String? name;
+    for (final snap in session.snaps) {
+      if (snap.id == id) name = snap.fileName;
+    }
+    final doomed = session.takeCommittedDeletes();
+    if (name != null && doomed.contains(id)) {
+      await deleteJpeg(session.gameId, name);
+    }
+  }
+
   Future<void> deleteJpeg(String gameId, String fileName) async {
     final file = File('${snapsRoot.path}/$gameId/$fileName');
     if (file.existsSync()) await file.delete();

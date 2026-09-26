@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 import '../engine/body.dart';
@@ -185,6 +187,7 @@ class PolaroidCard extends StatelessWidget {
   const PolaroidCard({
     super.key,
     required this.snap,
+    this.photo,
     this.ribbon = false,
     this.selected = false,
     this.heart,
@@ -192,6 +195,7 @@ class PolaroidCard extends StatelessWidget {
   });
 
   final Snap snap;
+  final Uint8List? photo;
   final bool ribbon;
   final bool selected;
   final bool? heart;
@@ -219,10 +223,13 @@ class PolaroidCard extends StatelessWidget {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      StageBackdrop(
-                        target: synthesizePose(poseAnglesFor(snap.poseId)),
-                        wallShift: snap.seq,
-                      ),
+                      if (photo != null)
+                        Image.memory(photo!, fit: BoxFit.cover, gaplessPlayback: true)
+                      else
+                        StageBackdrop(
+                          target: synthesizePose(poseAnglesFor(snap.poseId)),
+                          wallShift: snap.seq,
+                        ),
                       if (!snap.matched)
                         Align(
                           alignment: Alignment.bottomLeft,

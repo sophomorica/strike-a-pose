@@ -1,11 +1,20 @@
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
 
 import 'engine/game.dart';
+import 'engine/still.dart';
 
-/// Burns the caption into a JPEG. The judge ribbon stays a UI overlay.
-Uint8List renderSnapJpeg(Snap snap) {
+const snapPhotoLeft = 130;
+const snapPhotoTop = 120;
+const snapPhotoRight = 950;
+const snapPhotoBottom = 980;
+
+/// Burns the caption into a JPEG. A camera still is mirrored to match the
+/// preview. With no still, the referee path draws the foam-wall stage.
+/// The judge ribbon stays a UI overlay.
+Uint8List renderSnapJpeg(Snap snap, {StillFrame? still}) {
   const width = 1080;
   const height = 1350;
   final canvas = img.Image(width: width, height: height);
@@ -18,14 +27,23 @@ Uint8List renderSnapJpeg(Snap snap) {
     y2: 1180,
     color: img.ColorRgb8(255, 253, 247),
   );
-  img.fillRect(
-    canvas,
-    x1: 130,
-    y1: 120,
-    x2: 950,
-    y2: 980,
-    color: img.ColorRgb8(232, 93, 76),
-  );
+  if (still == null) {
+    img.fillRect(
+      canvas,
+      x1: snapPhotoLeft,
+      y1: snapPhotoTop,
+      x2: snapPhotoRight,
+      y2: snapPhotoBottom,
+      color: img.ColorRgb8(232, 93, 76),
+    );
+  } else {
+    final photo = _mirroredPhoto(
+      still,
+      snapPhotoRight - snapPhotoLeft,
+      snapPhotoBottom - snapPhotoTop,
+    );
+    img.compositeImage(canvas, photo, dstX: snapPhotoLeft, dstY: snapPhotoTop);
+  }
   final caption = '${snap.playerName} · ${snap.poseName}';
   final points = snap.matched ? '+${snap.points}  ${snap.fitPercent}% FIT' : snap.stamp;
   img.drawString(
@@ -53,4 +71,25 @@ Uint8List renderSnapJpeg(Snap snap) {
     color: img.ColorRgb8(247, 241, 227),
   );
   return Uint8List.fromList(img.encodeJpg(canvas, quality: 85));
+}
+
+img.Image _mirroredPhoto(StillFrame still, int dstW, int dstH) {
+  final bytes = Uint8List.fromList(still.bgra);
+  final source = img.Image.fromBytes(
+    width: still.width,
+    height: still.height,
+    bytes: bytes.buffer,
+    numChannels: 4,
+    order: img.ChannelOrder.bgra,
+  );
+  final flipped = img.flipHorizontal(source);
+  final scale = math.max(dstW / flipped.width, dstH / flipped.height);
+  final resized = img.copyResize(
+    flipped,
+    width: math.max(dstW, (flipped.width * scale).round()),
+    height: math.max(dstH, (flipped.height * scale).round()),
+  );
+  final cropX = math.max(0, (resized.width - dstW) ~/ 2);
+  final cropY = math.max(0, (resized.height - dstH) ~/ 2);
+  return img.copyCrop(resized, x: cropX, y: cropY, width: dstW, height: dstH);
 }

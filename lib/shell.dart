@@ -74,7 +74,10 @@ class _StrikeShellState extends State<StrikeShell> with SingleTickerProviderStat
     _games = [...widget.games];
     _ticker = createTicker(_onTick);
     if (widget.driveClock) _ticker.start();
-    widget.feed?.frames.listen((frame) => _latest = frame);
+    widget.feed?.frames.listen((frame) {
+      _latest = frame;
+      widget.session.latestStill = widget.feed?.latestStill;
+    });
     widget.feed?.changes.addListener(_refresh);
     if (widget.boot) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _sync());
@@ -173,31 +176,21 @@ class _StrikeShellState extends State<StrikeShell> with SingleTickerProviderStat
   }
 
   Future<void> _persist() async {
+    final session = widget.session;
     final store = widget.store;
-    if (store == null) return;
-    await store.saveSettings(widget.session);
-    for (final snap in widget.session.snaps) {
+    if (store != null) await store.saveSettings(session);
+    for (final snap in session.snaps) {
       if (_written.add(snap.id)) {
-        await store.writeJpeg(widget.session.gameId, snap.fileName, renderSnapJpeg(snap));
+        final jpeg = renderSnapJpeg(snap, still: session.stills[snap.id]);
+        session.photos[snap.id] = jpeg;
+        if (store != null) {
+          await store.writeJpeg(session.gameId, snap.fileName, jpeg);
+        }
       }
     }
-    if (widget.session.snaps.isNotEmpty) await store.saveGame(widget.session);
-    String? pendingName;
-    final pendingId = widget.session.undoSnapId;
-    if (pendingId != null && widget.session.undoLeft <= 0) {
-      pendingName = _fileFor(pendingId);
-    }
-    final doomed = widget.session.takeCommittedDeletes();
-    if (pendingName != null && doomed.isNotEmpty) {
-      await store.deleteJpeg(widget.session.gameId, pendingName);
-    }
-  }
-
-  String? _fileFor(String id) {
-    for (final snap in widget.session.snaps) {
-      if (snap.id == id) return snap.fileName;
-    }
-    return null;
+    if (store == null) return;
+    if (session.snaps.isNotEmpty) await store.saveGame(session);
+    await store.applyExpiredUndo(session);
   }
 
   void _afterTick() {

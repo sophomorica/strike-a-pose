@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 
 import 'engine/body.dart';
 import 'engine/catalog.dart';
+import 'engine/still.dart';
 import 'pose_feed.dart';
 
 /// Release builds fail closed. The debug fake also needs `--dart-define=FAKE_POSE=true`.
@@ -36,6 +37,9 @@ class FakePoseSource implements PoseFeed {
 
   @override
   Widget? buildPreview() => null;
+
+  @override
+  StillFrame? get latestStill => null;
 
   @override
   Future<bool> start() async {

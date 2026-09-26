@@ -778,7 +778,7 @@ class SnapshotScreen extends StatelessWidget {
         child: Column(
           children: [
             if (snap != null)
-              Expanded(child: PolaroidCard(snap: snap))
+              Expanded(child: PolaroidCard(snap: snap, photo: session.photos[snap.id]))
             else
               const Spacer(),
             if (score != null && score.matched) ...[
@@ -924,6 +924,7 @@ class JudgeScreen extends StatelessWidget {
                   for (final snap in snaps)
                     PolaroidCard(
                       snap: snap,
+                      photo: session.photos[snap.id],
                       selected: snap.id == session.selectedSnapId,
                       onTap: () {
                         session.toggleJudgeSelection(snap.id);
@@ -995,6 +996,7 @@ class ResultsScreen extends StatelessWidget {
               Expanded(
                 child: PolaroidCard(
                   snap: hero,
+                  photo: session.photos[hero.id],
                   ribbon: session.judgePicks.any((pick) => pick.snapId == hero.id),
                 ),
               )
@@ -1011,6 +1013,7 @@ class ResultsScreen extends StatelessWidget {
                       width: 88,
                       child: PolaroidCard(
                         snap: snap,
+                        photo: session.photos[snap.id],
                         ribbon: session.judgePicks.any((pick) => pick.snapId == snap.id),
                       ),
                     ),
@@ -1080,7 +1083,10 @@ class TieScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(4),
                         child: session.bestSnap(player.id) == null
                             ? Text(player.name, style: uiStyle(18))
-                            : PolaroidCard(snap: session.bestSnap(player.id)!),
+                            : PolaroidCard(
+                                snap: session.bestSnap(player.id)!,
+                                photo: session.photos[session.bestSnap(player.id)!.id],
+                              ),
                       ),
                     ),
                 ],
@@ -1190,6 +1196,7 @@ class KidsKeepScreen extends StatelessWidget {
                   for (final snap in session.snaps)
                     PolaroidCard(
                       snap: snap,
+                      photo: session.photos[snap.id],
                       heart: session.kept.contains(snap.id),
                       onTap: () {
                         session.toggleKeep(snap.id);
@@ -1500,6 +1507,13 @@ class GalleryScreen extends StatelessWidget {
                   for (final snap in session.snaps)
                     ListTile(
                       contentPadding: EdgeInsets.zero,
+                      leading: session.photos[snap.id] == null
+                          ? null
+                          : SizedBox(
+                              width: 48,
+                              height: 48,
+                              child: Image.memory(session.photos[snap.id]!, fit: BoxFit.cover),
+                            ),
                       title: Text('${snap.playerName} · ${snap.poseName}', style: uiStyle(16)),
                       subtitle: Text(snap.matched ? '+${snap.points}' : snap.stamp, style: bodyStyle(12)),
                       trailing: session.kidsGame

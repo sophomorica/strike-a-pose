@@ -6,6 +6,7 @@ import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 
 import 'engine/body.dart';
 import 'engine/mirror.dart';
+import 'engine/still.dart';
 import 'pose_feed.dart';
 
 /// Front camera plus ML Kit stream mode, base model. Tests never import this file.
@@ -17,6 +18,10 @@ class MlKitPoseSource implements PoseFeed {
   var _seen = 0;
   var _busy = false;
   var _running = false;
+  StillFrame? _latestStill;
+
+  @override
+  StillFrame? get latestStill => _latestStill;
 
   @override
   Stream<PoseFrame> get frames => _frames.stream;
@@ -73,6 +78,14 @@ class MlKitPoseSource implements PoseFeed {
     if (_seen.isOdd || _busy || _detector == null) return;
     _busy = true;
     try {
+      final plane = image.planes.first;
+      _latestStill = stillFromCamera(
+        bytes: plane.bytes,
+        width: image.width,
+        height: image.height,
+        bytesPerRow: plane.bytesPerRow,
+        sensorOrientation: sensorOrientation,
+      );
       final frame = await _detect(image, sensorOrientation);
       if (!_frames.isClosed) _frames.add(frame);
     } catch (_) {
