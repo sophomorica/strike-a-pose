@@ -4,7 +4,13 @@ This app is Flutter. The harness is `flutter test` and `flutter analyze`.
 
 ## Launch
 
-Clone https://github.com/sophomorica/strike-a-pose. Flutter 3.47.5 matches `.metadata`.
+The repo is https://github.com/sophomorica/strike-a-pose. Flutter 3.47.5 matches `.metadata`. Run the checks in the checkout of the branch you are verifying.
+
+```bash
+flutter pub get
+```
+
+To get a checkout:
 
 ```bash
 git clone https://github.com/sophomorica/strike-a-pose.git
