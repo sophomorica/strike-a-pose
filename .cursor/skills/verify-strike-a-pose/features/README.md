@@ -1,5 +1,7 @@
 # Feature map
 
+The repo is https://github.com/sophomorica/strike-a-pose.
+
 | Feature | What it covers | Check |
 | --- | --- | --- |
 | Deck | Players, deck tiles, body mode, rounds, Strike a pose | `features/deck.md` |

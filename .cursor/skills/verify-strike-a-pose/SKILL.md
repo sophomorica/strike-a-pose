@@ -1,12 +1,14 @@
 # Verify Strike a Pose
 
-This app is Flutter. The harness is `flutter test` and `flutter analyze`. There is no browser and no iOS simulator on this machine.
+This app is Flutter. The harness is `flutter test` and `flutter analyze`.
 
 ## Launch
 
+Clone https://github.com/sophomorica/strike-a-pose. Flutter 3.47.5 matches `.metadata`.
+
 ```bash
-export PATH="$HOME/sdk/flutter/bin:$PATH"
-cd /workspace
+git clone https://github.com/sophomorica/strike-a-pose.git
+cd strike-a-pose
 flutter pub get
 ```
 
@@ -38,7 +40,7 @@ The photo and undo checks are `test/snap_image_test.dart` (fixture pixels are mi
 
 ## Evidence
 
-Screenshots of each screen are written by `flutter test test/golden_test.dart` to `artifacts/screens/` and `/opt/cursor/artifacts/screens/`. The design-pack mock PNGs were not on disk, so there is no side-by-side composite.
+Checked-in screens live in `artifacts/screens/` on https://github.com/sophomorica/strike-a-pose. `flutter test test/golden_test.dart` also writes copies to `/workspace/artifacts/screens` and `/opt/cursor/artifacts/screens`. The design-pack mock PNGs were not on disk, so there is no side-by-side composite.
 
 Keep the analyzer and test logs from the last full run. Do not delete `artifacts/screens/`.
 
