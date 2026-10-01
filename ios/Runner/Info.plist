@@ -4,6 +4,8 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Strike a Pose uses the front camera as a mirror so it can see your pose and score it. Video is processed on this iPhone and is never recorded or uploaded.</string>
 	<key>UIUserInterfaceStyle</key>
 	<string>Dark</string>
 	<key>CFBundleDevelopmentRegion</key>

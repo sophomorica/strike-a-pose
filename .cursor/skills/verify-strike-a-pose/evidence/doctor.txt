@@ -1,0 +1,3 @@
+Analyzing workspace...
+No issues found! (ran in 8.2s)
+ANALYZE:0
