@@ -4,6 +4,16 @@ One iPhone, passed around the room. Players copy the hole in a foam wall. The ph
 
 This is the v1 game. The old practice round is gone.
 
+## Clone
+
+```bash
+git clone https://github.com/sophomorica/strike-a-pose.git
+cd strike-a-pose
+flutter pub get
+```
+
+Flutter 3.47.5 matches `.metadata`.
+
 ## Run the tests
 
 ```bash
@@ -11,7 +21,7 @@ flutter analyze
 flutter test
 ```
 
-This machine cannot run iOS. Pose scoring is pure Dart behind `PoseFeed`. `MlKitPoseSource` is the only production detector, and tests never import it.
+Pose scoring is pure Dart behind `PoseFeed`. `MlKitPoseSource` is the only production detector, and tests never import it.
 
 ## Run it on an iPhone
 
