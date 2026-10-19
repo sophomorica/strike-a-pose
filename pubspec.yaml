@@ -1,7 +1,7 @@
 name: strike_a_pose
 description: Strike a Pose v1. One iPhone, passed around the room.
 publish_to: 'none'
-version: 1.0.0+2
+version: 1.0.0+4
 
 environment:
   sdk: ^3.13.4
